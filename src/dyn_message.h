@@ -294,6 +294,8 @@ typedef enum dyn_error {
   BAD_FORMAT,
   DYNOMITE_NO_QUORUM_ACHIEVED,
   DYNOMITE_SCRIPT_SPANS_NODES,
+  // pr 812 - Fixes crash on large payloads for MGET/MSET/SCAN
+  DYNOMITE_PAYLOAD_TOO_LARGE,
 } dyn_error_t;
 
 static inline char *dn_strerror(dyn_error_t err) {
@@ -318,6 +320,9 @@ static inline char *dn_strerror(dyn_error_t err) {
       return "Failed to achieve Quorum";
     case DYNOMITE_SCRIPT_SPANS_NODES:
       return "Keys in the script cannot span multiple nodes";
+    // pr 812 - Fixes crash on large payloads for MGET/MSET/SCAN
+    case DYNOMITE_PAYLOAD_TOO_LARGE:
+      return "MSET/MGET/SCAN payload too large";
     default:
       return strerror(err);
   }
@@ -329,6 +334,8 @@ static inline char *dyn_error_source(dyn_error_t err) {
     case DYNOMITE_INVALID_STATE:
     case DYNOMITE_NO_QUORUM_ACHIEVED:
     case DYNOMITE_SCRIPT_SPANS_NODES:
+    // pr 812 - Fixes crash on large payloads for MGET/MSET/SCAN
+    case DYNOMITE_PAYLOAD_TOO_LARGE:
       return "Dynomite:";
     case PEER_CONNECTION_REFUSE:
     case PEER_HOST_DOWN:

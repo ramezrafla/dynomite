@@ -3030,7 +3030,10 @@ static rstatus_t redis_copy_bulk(struct msg *dst, struct msg *src, bool log) {
   }
 
   p = mbuf->pos;
-  ASSERT(*p == '$');
+  // pr 812 - Fixes crash on large payloads for MGET/MSET/SCAN
+  if (*p != '$') {
+    return DYNOMITE_PAYLOAD_TOO_LARGE;
+  }
   p++;
 
   if (p[0] == '-' && p[1] == '1') {
